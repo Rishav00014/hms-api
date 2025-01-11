@@ -26,8 +26,8 @@ async function getHalls(req, res) {
         if(req.user.role === "Supervisor") {
             filter.supervisor = userId;
         }
-        if(req.query.event) {
-            filter.event = req.query.event;
+        if(req.params.id) {
+            filter.event = req.params.id;
         }
         if(req.query.hallNumber) {
             filter.hallNumber = req.query.hallNumber;
@@ -71,14 +71,15 @@ async function updateHall(req, res) {
 
 async function deleteHall(req, res) {
     try {
+        let association = await Attendance.countDocuments({ hall: req.params.id });
+        if (association>0) {
+            return res.status(400).json({ message: "Hall has "+association+" associated with attendance" });
+        }
         const hall = await Hall.findByIdAndDelete(req.params.id);
         if (!hall) {
             return res.status(404).json({ message: "Hall not found" });
         }
-        let association = await Attendance.countDocuments({ halls: req.params.id });
-        if (association>0) {
-            return res.status(400).json({ message: "Hall has "+association+" associated with attendance" });
-        }
+        
         res.status(200).json({ message: "Hall deleted successfully" });
     } catch (err) {
         console.error(err);
@@ -152,13 +153,16 @@ async function updateEvent(req, res) {
 
 async function deleteEvent(req, res) {
     try {
-        const event = await Event.findByIdAndDelete(req.params.id);
-        if (!event) {
+        
+        let association = await Hall.countDocuments({ event: req.params.id });
+        if (association>0) {
+            return res.status(400).json({ message: "Event has "+association+" associated with Hall" });
+        }
+        const hall = await Hall.findByIdAndDelete(req.params.id);
+        if (!hall) {
             return res.status(404).json({ message: "Event not found" });
         }
-        if(event.halls.length>0){
-            return res.status(400).json({ message: "Remove Halls from event to delete event" });
-        }
+        
         res.status(200).json({ message: "Event deleted successfully" });
     } catch (err) {
         console.error(err);
@@ -170,7 +174,7 @@ async function deleteEvent(req, res) {
 async function createAttendance(req, res) {
     try {
         let userId = req.user._id;
-        const attendance = new Attendance({...req.body, createdBy: userId});
+        const attendance = new Attendance({...req.body , createdBy: userId});
         await attendance.save();
         res.status(201).json({
             message: "Attendance created successfully",
@@ -190,8 +194,8 @@ async function getAttendances(req, res) {
         if (req.query.designation) {
             filter.designation = req.query.designation;
         }
-        if (req.query.hall) {
-            filter.hall = req.query.hall;
+        if (req.params.hall) {
+            filter.hall = req.params.hall;
         }
         if (req.query.date) {
             filter.date = req.query.date;

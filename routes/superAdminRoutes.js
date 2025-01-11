@@ -25,7 +25,7 @@ router.put('/events/:id', AttendanceController.updateEvent);
 router.delete('/events/:id', AttendanceController.deleteEvent);
 
 // hall routes
-router.get('/halls', AttendanceController.getHalls);
+router.get('/events/:id/halls', AttendanceController.getHalls);
 router.post('/halls', AttendanceController.createHall);
 router.put('/halls/:id', AttendanceController.updateHall);
 router.delete('/halls/:id', AttendanceController.deleteHall);

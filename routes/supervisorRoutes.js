@@ -27,11 +27,15 @@ router.use(authoriseRole);
 
 
 router.get('/hall', AttendanceController.getHalls);
+
 router.get('/designation', AttendanceController.getDesignations);
+
+
+router.get('/hall/:id/attendance', AttendanceController.getAttendances);
 router.post('/attendance', AttendanceController.createAttendance);
-router.get('/attendance', AttendanceController.getAttendances);
 router.put('/attendance/:id', AttendanceController.updateAttendance);
 router.delete('/attendance/:id', AttendanceController.deleteAttendance);
+
 
 router.post('/upload',authenticateToken, upload.single('file'), imageController.uploadeImage);
 router.delete('/upload/:id',authenticateToken, imageController.deleteformCloudnamry);
