@@ -119,8 +119,7 @@ async function getEvents(req, res) {
                 createdAt: -1
             })
             .limit(limit)
-            .skip(skip)
-            .populate('halls')
+            .skip(skip);
 
         const count = await Event.countDocuments(filter);
         res.status(200).json({
