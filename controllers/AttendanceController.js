@@ -157,7 +157,7 @@ async function deleteEvent(req, res) {
         if (association>0) {
             return res.status(400).json({ message: "Event has "+association+" associated with Hall" });
         }
-        const hall = await Hall.findByIdAndDelete(req.params.id);
+        const hall = await Event.findByIdAndDelete(req.params.id);
         if (!hall) {
             return res.status(404).json({ message: "Event not found" });
         }
