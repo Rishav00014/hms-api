@@ -38,7 +38,9 @@ async function getHalls(req, res) {
                 createdAt: -1
             })
             .limit(limit)
-            .skip(skip);
+            .skip(skip)
+            .populate("supervisor");
+            
         const count = await Hall.countDocuments(filter);
 
         res.status(200).json({
