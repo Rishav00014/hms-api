@@ -41,7 +41,8 @@ async function getHalls(req, res) {
             .skip(skip)
             .populate("supervisor");
             
-        const count = await Hall.countDocuments(filter);
+        const count = await Hall.countDocuments(filter)
+            .populate("event");
 
         res.status(200).json({
             message: "Halls fetched successfully",
