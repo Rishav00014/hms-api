@@ -9,6 +9,7 @@ router.use(authoriseRole);
 
 // user routes
 router.get('/users', AuthController.getUsers);
+router.get('/users/role/:role', AuthController.getAllUsers);
 router.post('/users', AuthController.createUser);
 router.put('/users/:id', AuthController.updateUser);
 

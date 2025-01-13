@@ -163,6 +163,18 @@ const updateUser = async (req, res) => {
     }
 }
 
+const getAllUsers = async (req, res) => {
+    try {
+        const role = req.params.role;
+        const users = await User.find({
+            role
+        }).select("_id username name phoneNo role");
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({  message: 'Error getting users' });
+    }
+};
+
 module.exports = {
     createUser,
     signIn,
@@ -173,5 +185,6 @@ module.exports = {
     getDetails,
     getUsers,
     updateUser,
+    getAllUsers,
     logout
 };
