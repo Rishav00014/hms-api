@@ -24,7 +24,7 @@ router.get('/events', AttendanceController.getEvents);
 router.post('/events', AttendanceController.createEvent);
 router.put('/events/:id', AttendanceController.updateEvent);
 router.delete('/events/:id', AttendanceController.deleteEvent);
-router.get('/event/all', AttendanceController.getAllEvents);
+router.get('/events/all', AttendanceController.getAllEvents);
 
 // hall routes
 router.get('/events/:id/halls', AttendanceController.getHalls);
