@@ -378,11 +378,11 @@ async function generateEventReport(req, res) {
                     hall: hallList[i].hallNumber,
                     image: attendance[j].image,
                     name: attendance[j].name,
-                    mobileNo: attendance[j].mobileNo,
-                    position: attendance[j].position,
-                    designation: attendance[j].designation.name,
+                    mobileNo: attendance[j].mobileNo||"N/A",
+                    position: attendance[j].position||"N/A",
+                    designation: attendance[j].designation.title,
                     supervisorName: attendance[j].createdBy.name ||attendance[j].createdBy.username,
-                    supervisorMobileNo: attendance[j].createdBy.phoneNo,
+                    supervisorMobileNo: attendance[j].createdBy.phoneNo|| "N/A",
                     date: attendance[j].date,
                     shift: attendance[j].shift
                 };
