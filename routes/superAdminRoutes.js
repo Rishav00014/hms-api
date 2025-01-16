@@ -24,6 +24,7 @@ router.get('/events', AttendanceController.getEvents);
 router.post('/events', AttendanceController.createEvent);
 router.put('/events/:id', AttendanceController.updateEvent);
 router.delete('/events/:id', AttendanceController.deleteEvent);
+router.get('/event/all', AttendanceController.getAllEvents);
 
 // hall routes
 router.get('/events/:id/halls', AttendanceController.getHalls);
@@ -37,5 +38,7 @@ router.post('/attendance', AttendanceController.createAttendance);
 router.put('/attendance/:id', AttendanceController.updateAttendance);
 router.delete('/attendance/:id', AttendanceController.deleteAttendance);
 
+//report routes
+router.get('/reports/:id', AttendanceController.generateEventReport);
 
 module.exports = router;

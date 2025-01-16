@@ -329,6 +329,79 @@ async function deleteDesignation(req, res) {
     }
 }
 
+async function getAllEvents(req, res) {
+    try {
+        let events = await Event.find()
+            .sort({
+                createdAt: -1
+            });
+        res.status(200).json({
+            message: "Events fetched successfully",
+            data: events
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+};
+
+async function generateEventReport(req, res) {
+    try {
+        let eventId =req.params.id;
+        if(!eventId) {
+            return res.status(400).json({ message: "Event id is required" });
+        }
+        let reportData =[];
+        let filter = {
+            event: eventId
+        };
+        let hallList = await Hall.find(filter);
+
+        filter={};
+        if (req.query.startDate) {
+            filter.startDate = { $gte: req.query.startDate };
+        }
+        if (req.query.endDate) {
+            filter.endDate = { $lte: req.query.endDate };
+        }
+        for(let i=0; i<hallList.length; i++) {
+            filter.hall = hallList[i]._id;
+            let attendance = await Attendance.find(filter)
+                .populate("createdBy")
+                .populate("designation")
+                .sort({
+                    createdAt: -1
+                })
+                .lean();
+            for(let j=0; j<attendance.length; j++) {
+                let data = {
+                    hall: hallList[i].hallNumber,
+                    image: attendance[j].image,
+                    name: attendance[j].name,
+                    mobileNo: attendance[j].mobileNo,
+                    position: attendance[j].position,
+                    designation: attendance[j].designation.name,
+                    supervisorName: attendance[j].createdBy.name ||attendance[j].createdBy.username,
+                    supervisorMobileNo: attendance[j].createdBy.mobileNo,
+                    date: attendance[j].date,
+                    shift: attendance[j].shift
+                };
+                reportData.push(data);
+            }
+        }
+
+        res.status(200).json({
+            message: "Events fetched successfully",
+            data: reportData
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+};
+
+
+
 module.exports = {
     createHall,
     getHalls,
@@ -350,5 +423,8 @@ module.exports = {
     createDesignation,
     getDesignations,
     updateDesignation,
-    deleteDesignation
+    deleteDesignation,
+
+    getAllEvents,
+    generateEventReport
 };
