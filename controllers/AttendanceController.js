@@ -382,7 +382,7 @@ async function generateEventReport(req, res) {
                     position: attendance[j].position,
                     designation: attendance[j].designation.name,
                     supervisorName: attendance[j].createdBy.name ||attendance[j].createdBy.username,
-                    supervisorMobileNo: attendance[j].createdBy.mobileNo,
+                    supervisorMobileNo: attendance[j].createdBy.phoneNo,
                     date: attendance[j].date,
                     shift: attendance[j].shift
                 };
