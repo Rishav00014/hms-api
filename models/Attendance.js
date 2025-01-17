@@ -37,7 +37,7 @@ const attendanceSchema = new mongoose.Schema({
     },
     shift: {
         type: String,
-        enum: ['morning', 'afternoon', 'evening', 'night'],
+        enum: ['day' ,'night'],
         required: true
     },
     createdAt: {
