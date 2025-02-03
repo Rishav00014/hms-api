@@ -6,13 +6,17 @@ const attendanceSchema = new mongoose.Schema({
         ref: 'Hall',
         required: true
     },
-    name: {
+    identifier: {
         type: String,
         required: true
     },
-    mobileNo:{
-        type:String,
-        required:true
+    venderCode:{
+        type: String,
+        required: true
+    },
+    name: {
+        type: String,
+        required: true
     },
     position: {
         type: String,
@@ -31,9 +35,6 @@ const attendanceSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    },
-    date: {
-        type: Date
     },
     shift: {
         type: String,

@@ -39,7 +39,8 @@ async function getHalls(req, res) {
             })
             .limit(limit)
             .skip(skip)
-            .populate("supervisor");
+            .populate("supervisor")
+            .populate("event"); 
             
         const count = await Hall.countDocuments(filter)
             .populate("event");
@@ -176,7 +177,13 @@ async function deleteEvent(req, res) {
 async function createAttendance(req, res) {
     try {
         let userId = req.user._id;
-        const attendance = new Attendance({...req.body , createdBy: userId});
+        let designation = await Designation.findById(req.body.designation);
+        let identifier = `${req.body.venderCode.toLowerCase().trim()}-${req.body.name.toLowerCase().trim()}-${designation.title.toLowerCase().trim()}`;
+        const attendance = new Attendance({
+            ...req.body , 
+            createdBy: userId, 
+            identifier
+        });
         await attendance.save();
         res.status(201).json({
             message: "Attendance created successfully",
@@ -199,8 +206,12 @@ async function getAttendances(req, res) {
         if (req.params.hall) {
             filter.hall = req.params.hall;
         }
-        if (req.query.date) {
-            filter.date = req.query.date;
+        if (req.query.createdAt) {
+            // should contain all attendance of that day 
+            filter.createdAt = { 
+                $gte: new Date(req.query.createdAt).setHours(0, 0, 0, 0),
+                $lt: new Date(req.query.createdAt).setHours(23, 59, 59, 999) 
+            }
         }
         if (req.query.shift) {
             filter.shift = req.query.shift;
