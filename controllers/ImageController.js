@@ -32,6 +32,7 @@ const uploadeImage = (async (req, res) => {
             publicId: result.public_id,
             createdBy:userId
         })
+        await imageData.save();
         res.status(200).json({
             message: "Image uploaded successfully",
             data: imageData
