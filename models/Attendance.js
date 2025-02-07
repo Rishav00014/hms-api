@@ -11,8 +11,8 @@ const attendanceSchema = new mongoose.Schema({
         required: true
     },
     venderCode:{
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'VenderCode',
     },
     name: {
         type: String,

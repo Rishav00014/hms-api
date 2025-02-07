@@ -2,7 +2,7 @@ const Hall = require('../models/Hall');
 const Event = require('../models/Event');
 const Designation = require('../models/Designation');
 const Attendance = require('../models/Attendance');
-
+const VenderCode = require('../models/VenderCode');
 const { pagination } = require('../helpers/index');
 
 async function createHall(req, res) {
@@ -227,7 +227,8 @@ async function getAttendances(req, res) {
             .skip(skip)
             .populate('designation')
             .populate('createdBy')
-            .populate('hall');
+            .populate('hall')
+            .populate('venderCode');
 
         const count = await Attendance.countDocuments(filter);
 
@@ -411,31 +412,72 @@ async function generateEventReport(req, res) {
     }
 };
 
+async function createVendorCode(req, res) {
+    try {
+        const vendorCode = new VenderCode(req.body);
+        await vendorCode.save();
+        res.status(201).json({
+            message: "Vendor Code created successfully",
+            data: vendorCode
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+}
+
+async function getVendorCodes(req, res) {
+    try {
+        let { limit, skip } = pagination(req);
+        const vendorCodes = await VenderCode.find()
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .skip(skip);
+        const count = await VenderCode.countDocuments();
+        res.status(200).json({ 
+            message: "Vendor Codes fetched successfully",
+            data: vendorCodes, 
+            count 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+}
+
+async function updateVendorCode(req, res) {
+    try {
+        const vendorCode = await VenderCode.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!vendorCode) {
+            return res.status(404).json({ message: "Vendor Code not found" });
+        }
+        res.status(200).json(vendorCode);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+}
+
+async function deleteVendorCode(req, res) {
+    try {
+        const vendorCode = await VenderCode.findByIdAndDelete(req.params.id);
+        if (!vendorCode) {
+            return res.status(404).json({ message: "Vendor Code not found" });
+        }
+        res.status(200).json({ message: "Vendor Code deleted successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+}
 
 
 module.exports = {
-    createHall,
-    getHalls,
-    updateHall,
-    deleteHall,
-    
-    createEvent,
-    getEvents,
-    updateEvent,
-    deleteEvent,
-
-    
-    createAttendance,
-    getAttendances,
-    updateAttendance,
-    deleteAttendance,
-
-    
-    createDesignation,
-    getDesignations,
-    updateDesignation,
-    deleteDesignation,
-
+    createHall, getHalls, updateHall,deleteHall,
+    createEvent, getEvents, updateEvent, deleteEvent,
+    createAttendance, getAttendances, updateAttendance, deleteAttendance,
+    createDesignation, getDesignations, updateDesignation, deleteDesignation,
+    createVendorCode, getVendorCodes, updateVendorCode, deleteVendorCode,
     getAllEvents,
     generateEventReport
 };

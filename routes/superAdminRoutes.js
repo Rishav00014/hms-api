@@ -38,6 +38,12 @@ router.post('/attendance', AttendanceController.createAttendance);
 router.put('/attendance/:id', AttendanceController.updateAttendance);
 router.delete('/attendance/:id', AttendanceController.deleteAttendance);
 
+// vender code routes
+router.get('/vender-codes', AttendanceController.getVendorCodes);
+router.post('/vender-codes', AttendanceController.createVendorCode);
+router.put('/vender-codes/:id', AttendanceController.updateVendorCode);
+router.delete('/vender-codes/:id', AttendanceController.deleteVendorCode);
+
 //report routes
 router.get('/reports/:id', AttendanceController.generateEventReport);
 

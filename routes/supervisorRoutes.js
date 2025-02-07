@@ -29,7 +29,7 @@ router.use(authoriseRole);
 router.get('/hall', AttendanceController.getHalls);
 
 router.get('/designation', AttendanceController.getDesignations);
-
+router.get('/vender-code', AttendanceController.getVendorCodes);
 
 router.get('/hall/:id/attendance', AttendanceController.getAttendances);
 router.post('/attendance', AttendanceController.createAttendance);
