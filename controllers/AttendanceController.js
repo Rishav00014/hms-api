@@ -379,22 +379,21 @@ async function generateEventReport(req, res) {
         for(let i=0; i<hallList.length; i++) {
             filter.hall = hallList[i]._id;
             let attendance = await Attendance.find(filter)
-                .populate("createdBy")
+                .populate("venderCode")
                 .populate("designation")
                 .sort({
                     createdAt: -1
                 })
                 .lean();
+                
             for(let j=0; j<attendance.length; j++) {
                 let data = {
                     hall: hallList[i].hallNumber,
+                    vendorCode: attendance[j].venderCode.code,
                     image: attendance[j].image,
                     name: attendance[j].name,
-                    mobileNo: attendance[j].mobileNo||"N/A",
-                    position: attendance[j].position||"N/A",
+                    position: attendance[j].position,
                     designation: attendance[j].designation.title,
-                    supervisorName: attendance[j].createdBy.name ||attendance[j].createdBy.username,
-                    supervisorMobileNo: attendance[j].createdBy.phoneNo|| "N/A",
                     date: attendance[j].date,
                     shift: attendance[j].shift
                 };
