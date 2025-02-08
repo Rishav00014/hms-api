@@ -438,8 +438,8 @@ const getDateRangeWithShifts = (startDate, endDate) => {
 
     while (currentDate <= new Date(endDate)) {
         const formattedDate = currentDate.toISOString().split("T")[0];
-        result.push(`${formattedDate}_day`);
-        result.push(`${formattedDate}_night`);
+        result.push(`${formattedDate}-day`);
+        result.push(`${formattedDate}-night`);
 
         currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -467,12 +467,13 @@ async function generateAttendanceSheet(req, res) {
         if (!event) {
             return res.status(404).json({ message: "Event not found" });
         }
-
-        const attendances = await Attendance.find({ event: eventId })
+        let halls = await Hall.find({ event: eventId }).lean();
+        let hallIds = halls.map(hall => hall._id);
+        const attendances = await Attendance.find({ hall: { $in: hallIds } })
             .populate('venderCode', 'code')
             .populate('designation', 'title')
             .lean();
-
+        console.log(attendances.length);
         const dateShiftColumns = getDateRangeWithShifts(event.startDate, event.endDate);
         const register = [];
         const attendanceMap = new Map();
@@ -481,7 +482,6 @@ async function generateAttendanceSheet(req, res) {
         for (const attendance of attendances) {
             if (!attendanceMap.has(attendance.identifier)) {
                 attendanceMap.set(attendance.identifier, {
-                    "S.No": register.length + 1,
                     "Vendor Code": attendance.venderCode?.code || "",
                     "Designation": attendance.designation?.title || "",
                     "Name": attendance.name,
