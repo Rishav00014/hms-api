@@ -357,6 +357,39 @@ async function getAllEvents(req, res) {
     }
 };
 
+async function getAllDesignations(req, res) {
+    try {
+        let designations = await Designation.find()
+            .sort({
+                createdAt: -1
+            });
+        res.status(200).json({
+            message: "Designations fetched successfully",
+            data: designations
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+}
+
+async function getAllVendorCodes(req, res) {
+    try {
+        let vendorCodes = await VenderCode.find()
+            .sort({
+                createdAt: -1
+            });
+        res.status(200).json({
+            message: "Vendor Codes fetched successfully",
+            data: vendorCodes
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+}
+
+
 async function generateEventReport(req, res) {
     try {
         let eventId = req.params.id;
@@ -388,9 +421,7 @@ async function generateEventReport(req, res) {
         if (req.query.designation && req.query.designation !== "all") {
             filter.designation = req.query.designation;
         }
-        if (req.query.hall && req.query.hall !== "all") {
-            filter.hall = req.query.hall;
-        }
+
         if (req.query.venderCode && req.query.venderCode !== "all") {
             filter.venderCode = req.query.venderCode;
         }
@@ -589,6 +620,6 @@ module.exports = {
     createAttendance, getAttendances, updateAttendance, deleteAttendance,
     createDesignation, getDesignations, updateDesignation, deleteDesignation,
     createVendorCode, getVendorCodes, updateVendorCode, deleteVendorCode,
-    getAllEvents,
+    getAllEvents,getAllDesignations,getAllVendorCodes,
     generateEventReport, generateAttendanceSheet
 };

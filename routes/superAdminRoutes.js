@@ -18,6 +18,7 @@ router.get('/designations', AttendanceController.getDesignations);
 router.post('/designations', AttendanceController.createDesignation);
 router.put('/designations/:id',AttendanceController.updateDesignation);
 router.delete('/designations/:id', AttendanceController.deleteDesignation);
+router.get('/designations/all', AttendanceController.getAllDesignations);
 
 // event routes
 router.get('/events', AttendanceController.getEvents);
@@ -43,6 +44,7 @@ router.get('/vender-codes', AttendanceController.getVendorCodes);
 router.post('/vender-codes', AttendanceController.createVendorCode);
 router.put('/vender-codes/:id', AttendanceController.updateVendorCode);
 router.delete('/vender-codes/:id', AttendanceController.deleteVendorCode);
+router.get('/vender-codes/all', AttendanceController.getAllVendorCodes);
 
 //report routes
 router.get('/reports/:id', AttendanceController.generateEventReport);
