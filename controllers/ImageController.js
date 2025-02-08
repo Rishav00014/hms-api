@@ -2,7 +2,7 @@ const fs = require('fs').promises;
 const config = require("../config/config");
 const Image = require("../models/Image");
 
-const cloudinary  = require("cloudinary").v2;
+const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
     cloud_name: config.cloudinary.cloudName,
@@ -18,7 +18,10 @@ const uploadeImage = (async (req, res) => {
     const file = req.file;
     try {
         const result = await new Promise((resolve, reject) => {
-            cloudinary.uploader.upload(file.path, (err, result) => {
+            cloudinary.uploader.upload(file.path, {
+                folder: "hms-uploads",
+                quality: "auto",
+              }, (err, result) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -30,7 +33,7 @@ const uploadeImage = (async (req, res) => {
         let imageData = new Image({
             image: result.url,
             publicId: result.public_id,
-            createdBy:userId
+            createdBy: userId
         })
         await imageData.save();
         res.status(200).json({
@@ -43,14 +46,14 @@ const uploadeImage = (async (req, res) => {
             data: error
         });
     }
-    
+
 });
 
 const deleteformCloudnamry = async (req, res) => {
     try {
         let userId = req.user._id;
         const id = req.params.id;
-        await Image.findOneAndDelete({publicId:id,createdBy:userId}) 
+        await Image.findOneAndDelete({ publicId: id, createdBy: userId })
         const result = await cloudinary.uploader.destroy(id);
         res.status(200).json({
             message: "image deleted successfully",
@@ -71,5 +74,5 @@ const commonController = {
     uploadeImage,
     deleteformCloudnamry
 };
-  
+
 module.exports = commonController;

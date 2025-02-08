@@ -46,5 +46,6 @@ router.delete('/vender-codes/:id', AttendanceController.deleteVendorCode);
 
 //report routes
 router.get('/reports/:id', AttendanceController.generateEventReport);
+router.get('/attendance/reports/:id', AttendanceController.generateAttendanceSheet);
 
 module.exports = router;

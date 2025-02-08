@@ -23,13 +23,13 @@ async function getHalls(req, res) {
     try {
         let userId = req.user._id;
         let filter = {};
-        if(req.user.role === "Supervisor") {
+        if (req.user.role === "Supervisor") {
             filter.supervisor = userId;
         }
-        if(req.params.id) {
+        if (req.params.id) {
             filter.event = req.params.id;
         }
-        if(req.query.hallNumber) {
+        if (req.query.hallNumber) {
             filter.hallNumber = req.query.hallNumber;
         }
         let { limit, skip } = pagination(req);
@@ -40,8 +40,8 @@ async function getHalls(req, res) {
             .limit(limit)
             .skip(skip)
             .populate("supervisor")
-            .populate("event"); 
-            
+            .populate("event");
+
         const count = await Hall.countDocuments(filter)
             .populate("event");
 
@@ -76,14 +76,14 @@ async function updateHall(req, res) {
 async function deleteHall(req, res) {
     try {
         let association = await Attendance.countDocuments({ hall: req.params.id });
-        if (association>0) {
-            return res.status(400).json({ message: "Hall has "+association+" associated with attendance" });
+        if (association > 0) {
+            return res.status(400).json({ message: "Hall has " + association + " associated with attendance" });
         }
         const hall = await Hall.findByIdAndDelete(req.params.id);
         if (!hall) {
             return res.status(404).json({ message: "Hall not found" });
         }
-        
+
         res.status(200).json({ message: "Hall deleted successfully" });
     } catch (err) {
         console.error(err);
@@ -117,7 +117,7 @@ async function getEvents(req, res) {
         if (req.query.endDate) {
             filter.endDate = { $lte: req.query.endDate };
         }
-        let {limit, skip} = pagination(req);
+        let { limit, skip } = pagination(req);
         const events = await Event.find(filter)
             .sort({
                 createdAt: -1
@@ -156,16 +156,16 @@ async function updateEvent(req, res) {
 
 async function deleteEvent(req, res) {
     try {
-        
+
         let association = await Hall.countDocuments({ event: req.params.id });
-        if (association>0) {
-            return res.status(400).json({ message: "Event has "+association+" associated with Hall" });
+        if (association > 0) {
+            return res.status(400).json({ message: "Event has " + association + " associated with Hall" });
         }
         const hall = await Event.findByIdAndDelete(req.params.id);
         if (!hall) {
             return res.status(404).json({ message: "Event not found" });
         }
-        
+
         res.status(200).json({ message: "Event deleted successfully" });
     } catch (err) {
         console.error(err);
@@ -180,8 +180,8 @@ async function createAttendance(req, res) {
         let designation = await Designation.findById(req.body.designation);
         let identifier = `${req.body.venderCode.toLowerCase().trim()}-${req.body.name.toLowerCase().trim()}-${designation.title.toLowerCase().trim()}`;
         const attendance = new Attendance({
-            ...req.body , 
-            createdBy: userId, 
+            ...req.body,
+            createdBy: userId,
             identifier
         });
         await attendance.save();
@@ -208,15 +208,15 @@ async function getAttendances(req, res) {
         }
         if (req.query.createdAt) {
             // should contain all attendance of that day 
-            filter.createdAt = { 
+            filter.createdAt = {
                 $gte: new Date(req.query.createdAt).setHours(0, 0, 0, 0),
-                $lt: new Date(req.query.createdAt).setHours(23, 59, 59, 999) 
+                $lt: new Date(req.query.createdAt).setHours(23, 59, 59, 999)
             }
         }
         if (req.query.shift) {
             filter.shift = req.query.shift;
         }
-        if(req.user.role === "Supervisor") {
+        if (req.user.role === "Supervisor") {
             filter.createdBy = userId;
         }
         const attendances = await Attendance.find(filter)
@@ -246,11 +246,11 @@ async function getAttendances(req, res) {
 
 async function updateAttendance(req, res) {
     try {
-        if(req.body.createdAt) {
+        if (req.body.createdAt) {
             return res.status(400).json({ message: "Designation cannot be updated" });
         }
         const attendance = await Attendance.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        
+
         if (!attendance) {
             return res.status(404).json({ message: "Attendance not found" });
         }
@@ -299,10 +299,10 @@ async function getDesignations(req, res) {
             .limit(limit)
             .skip(skip);
         const count = await Designation.countDocuments();
-        res.status(200).json({ 
+        res.status(200).json({
             message: "Designations fetched successfully",
-            data: designations, 
-            count 
+            data: designations,
+            count
         });
     } catch (err) {
         console.error(err);
@@ -331,8 +331,8 @@ async function deleteDesignation(req, res) {
             return res.status(404).json({ message: "Designation not found" });
         }
         let association = await Attendance.countDocuments({ designation: req.params.id });
-        if (association>0) {
-            return res.status(400).json({ message: "Designation has "+association+" associated with attendance" });
+        if (association > 0) {
+            return res.status(400).json({ message: "Designation has " + association + " associated with attendance" });
         }
         res.status(200).json({ message: "Designation deleted successfully" });
     } catch (err) {
@@ -359,24 +359,43 @@ async function getAllEvents(req, res) {
 
 async function generateEventReport(req, res) {
     try {
-        let eventId =req.params.id;
-        if(!eventId) {
+        let eventId = req.params.id;
+        if (!eventId) {
             return res.status(400).json({ message: "Event id is required" });
         }
-        let reportData =[];
+        let reportData = [];
+
+        let eventDetails = await Event.find({
+            _id: eventId
+        })
+
         let filter = {
             event: eventId
         };
         let hallList = await Hall.find(filter);
 
-        filter={};
-        if (req.query.startDate) {
-            filter.startDate = { $gte: req.query.startDate };
+        filter = {};
+        if (req.query.createdAt) {
+            // should contain all attendance of that day 
+            filter.createdAt = {
+                $gte: new Date(req.query.createdAt).setHours(0, 0, 0, 0),
+                $lt: new Date(req.query.createdAt).setHours(23, 59, 59, 999)
+            }
         }
-        if (req.query.endDate) {
-            filter.endDate = { $lte: req.query.endDate };
+        if (req.query.shift && req.query.shift !== "all") {
+            filter.shift = req.query.shift;
         }
-        for(let i=0; i<hallList.length; i++) {
+        if (req.query.designation && req.query.designation !== "all") {
+            filter.designation = req.query.designation;
+        }
+        if (req.query.hall && req.query.hall !== "all") {
+            filter.hall = req.query.hall;
+        }
+        if (req.query.venderCode && req.query.venderCode !== "all") {
+            filter.venderCode = req.query.venderCode;
+        }
+
+        for (let i = 0; i < hallList.length; i++) {
             filter.hall = hallList[i]._id;
             let attendance = await Attendance.find(filter)
                 .populate("venderCode")
@@ -385,8 +404,8 @@ async function generateEventReport(req, res) {
                     createdAt: -1
                 })
                 .lean();
-                
-            for(let j=0; j<attendance.length; j++) {
+
+            for (let j = 0; j < attendance.length; j++) {
                 let data = {
                     hall: hallList[i].hallNumber,
                     vendorCode: attendance[j].venderCode.code,
@@ -403,13 +422,106 @@ async function generateEventReport(req, res) {
 
         res.status(200).json({
             message: "Events fetched successfully",
-            data: reportData
+            data: reportData,
+            event: eventDetails
         });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal server error", error: err.message });
     }
 };
+
+
+const getDateRangeWithShifts = (startDate, endDate) => {
+    const result = [];
+    let currentDate = new Date(startDate);
+
+    while (currentDate <= new Date(endDate)) {
+        const formattedDate = currentDate.toISOString().split("T")[0];
+        result.push(`${formattedDate}_day`);
+        result.push(`${formattedDate}_night`);
+
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return result;
+};
+const formatDate = (date) => {
+    const [day, month, year] = [
+        date.getDate(),
+        date.getMonth() + 1,
+        date.getFullYear(),
+    ].map(num => String(num).padStart(2, '0'));
+
+    return `${year}-${month}-${day}`;
+};
+
+async function generateAttendanceSheet(req, res) {
+    try {
+        const eventId = req.params.id;
+        if (!eventId) {
+            return res.status(400).json({ message: "Event id is required" });
+        }
+
+        const event = await Event.findById(eventId).lean();
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
+
+        const attendances = await Attendance.find({ event: eventId })
+            .populate('venderCode', 'code')
+            .populate('designation', 'title')
+            .lean();
+
+        const dateShiftColumns = getDateRangeWithShifts(event.startDate, event.endDate);
+        const register = [];
+        const attendanceMap = new Map();
+
+        // Pre-group attendances by identifier
+        for (const attendance of attendances) {
+            if (!attendanceMap.has(attendance.identifier)) {
+                attendanceMap.set(attendance.identifier, {
+                    "S.No": register.length + 1,
+                    "Vendor Code": attendance.venderCode?.code || "",
+                    "Designation": attendance.designation?.title || "",
+                    "Name": attendance.name,
+                    "Total": 0
+                });
+
+                // Initialize date shift columns to 0
+                for (const col of dateShiftColumns) {
+                    attendanceMap.get(attendance.identifier)[col] = 0;
+                }
+            }
+        }
+
+        // Populate the date-shift columns
+        for (const attendance of attendances) {
+            const identifier = attendance.identifier;
+            const dateShiftKey = `${formatDate(attendance.createdAt)}-${attendance.shift}`;
+
+            if (attendanceMap.has(identifier)) {
+                const record = attendanceMap.get(identifier);
+                if (record.hasOwnProperty(dateShiftKey)) {
+                    record[dateShiftKey] = 1;
+                    record["Total"] += 1;
+                }
+            }
+        }
+
+        // Convert map values to array
+        res.status(200).json({
+            message: "Attendance sheet generated successfully",
+            data: Array.from(attendanceMap.values())
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error", error: err.message });
+    }
+}
+
+
 
 async function createVendorCode(req, res) {
     try {
@@ -433,10 +545,10 @@ async function getVendorCodes(req, res) {
             .limit(limit)
             .skip(skip);
         const count = await VenderCode.countDocuments();
-        res.status(200).json({ 
+        res.status(200).json({
             message: "Vendor Codes fetched successfully",
-            data: vendorCodes, 
-            count 
+            data: vendorCodes,
+            count
         });
     } catch (err) {
         console.error(err);
@@ -472,11 +584,11 @@ async function deleteVendorCode(req, res) {
 
 
 module.exports = {
-    createHall, getHalls, updateHall,deleteHall,
+    createHall, getHalls, updateHall, deleteHall,
     createEvent, getEvents, updateEvent, deleteEvent,
     createAttendance, getAttendances, updateAttendance, deleteAttendance,
     createDesignation, getDesignations, updateDesignation, deleteDesignation,
     createVendorCode, getVendorCodes, updateVendorCode, deleteVendorCode,
     getAllEvents,
-    generateEventReport
+    generateEventReport, generateAttendanceSheet
 };
