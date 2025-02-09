@@ -7,17 +7,8 @@ const { authenticateToken,authoriseRole } = require('../middlewares/authMiddlewa
 const AttendanceController = require('../controllers/AttendanceController');
 const imageController = require("../controllers/ImageController");
 
-// Multer configuration
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        // Specify the directory where you want to store uploaded files
-        cb(null, 'uploads/')
-    },
-    filename: function (req, file, cb) {
-        // Generate unique filename
-        cb(null, Date.now() + '-' + file.originalname)
-    }
-});
+// Multer configuration for memory storage
+const storage = multer.memoryStorage();
 
 const upload = multer({ storage: storage });
 

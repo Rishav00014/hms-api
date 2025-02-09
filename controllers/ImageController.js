@@ -1,7 +1,7 @@
 const fs = require('fs').promises;
 const config = require("../config/config");
 const Image = require("../models/Image");
-
+const sharp = require('sharp');
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
@@ -17,31 +17,30 @@ const uploadeImage = (async (req, res) => {
     }
     const file = req.file;
     try {
+        const buffer = await sharp(file.buffer).jpeg({quality:5}).toBuffer();
+
         const result = await new Promise((resolve, reject) => {
-            cloudinary.uploader.upload(file.path, {
-                folder: "hms-uploads",
-                quality: "auto:low"
-              }, (err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result);
+            cloudinary.uploader.upload_stream({ resource_type: 'auto' }, (error, result) => {
+                if (error) {
+                    reject(error);
                 }
-            });
+                resolve(result);
+            }).end(buffer);
         });
-        await fs.unlink(file.path);
+
         let imageData = new Image({
             image: result.url,
             publicId: result.public_id,
             createdBy: userId
         })
         await imageData.save();
-        res.status(200).json({
+        return res.status(200).json({
             message: "Image uploaded successfully",
             data: imageData
         });
     } catch (error) {
-        res.status(400).json({
+        console.log(error);
+        return res.status(400).json({
             message: "Image upload failed.",
             data: error
         });
