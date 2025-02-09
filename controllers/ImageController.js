@@ -20,7 +20,7 @@ const uploadeImage = (async (req, res) => {
         const result = await new Promise((resolve, reject) => {
             cloudinary.uploader.upload(file.path, {
                 folder: "hms-uploads",
-                quality: "auto",
+                quality: "auto:low"
               }, (err, result) => {
                 if (err) {
                     reject(err);
