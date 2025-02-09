@@ -27,8 +27,8 @@ const config = {
         apiSecret:process.env.CLOUDINARY_API_SECRET
     },
     pagination:{
-        limit:30,
-        maxLimit:100
+        limit:100,
+        maxLimit:500
     }
 };
 
