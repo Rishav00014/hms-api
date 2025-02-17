@@ -203,9 +203,11 @@ async function getAttendances(req, res) {
         if (req.query.designation) {
             filter.designation = req.query.designation;
         }
+        /*
         if (req.params.id) {
             filter.hall = req.params.id;
         }
+        */
         if (req.query.createdAt) {
             // should contain all attendance of that day 
             filter.createdAt = {
